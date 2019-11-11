@@ -17,6 +17,7 @@ Features to be added:
 * Syntax highlighting
 * Toggle menubar
 * Tab-character width
+
 I've chosen to hide the menubar by default, I personally find it to be a distraction but I will be adding a toggle option in the future.
 
 Otherwise a pretty simply written code that's easy to follow, I'll make a separate config file once the features are done with but you can easily just edit the main file.

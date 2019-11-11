@@ -38,10 +38,10 @@ class Statusbar:
 		poscol,posrow = self.textarea.index(tk.INSERT).split(".")
 		
 		#to display
-		charcount = "| char: " + char
-		wordcount = "| word: " + word
+		charcount = " | char: " + char
+		wordcount = " | word: " + word
 		cursorcol = "- row: " + poscol
-		cursorrow = "| col: " + posrow
+		cursorrow = " | col: " + posrow
 		
 		self.status.set(( "saved | " if isinstance(args[0], bool) else "") + cursorcol + cursorrow  + charcount + wordcount)
 		

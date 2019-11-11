@@ -60,7 +60,7 @@ class Menubar:
 		#toggle menubar display
 		#menubar.add_cascade(label="xxx", menu=dropdown)
 		
-class om:
+class omi:
 	def __init__(self, master):
 		self.filename = None;
 		master.title(self.filename)
@@ -188,6 +188,6 @@ class om:
 if __name__ == "__main__":
 	master = tk.Tk()
 	master.iconbitmap(default="logo.ico")
-	window = om(master)
+	window = omi(master)
 	master.mainloop()
 	

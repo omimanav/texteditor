@@ -1,33 +1,40 @@
 """
 SHIT LEFT TO DO
 ---------------
-> stack statusbar below textarea
+> set preferences
 
 >> fix tabbing (custom sizes and proper indentation)
+>> themes
 
 >>> syntax highlighting
 """
 import tkinter as tk
-from tkinter import filedialog, messagebox
+import userconfig
+from tkinter import filedialog, messagebox, Frame
 from datetime import datetime
 
-#general preferences
-tabwidth = 4
-tabstyle = "tab" #tab | space
-fontspecs = ("Consolas", 10) #universal font
+#preferences
+config = userconfig.Userconfig().get()
+
+tabwidth = config["tabwidth"]
+tabstyle = config["tabstyle"]
+fontspecs = tuple(config["font"])
+userbg = "white" if config["theme"] == "light" else "black"
+userfg = "black" if config["theme"] == "light" else "white"
 
 settingstext = "\n\tControls:\n\t---------\n\tCTRL+N - New/Clear\n\tCTRL+S - Save\n\tCTRL+SHIFT+S - Save as..\n\tCTRL+O - Open file\n\tCTRL+W - Close window\n\tCTRL+` - Toggle status bar\n\tCTRL+Z - Undo\n\n\t--COMING SOON\n\tCTRL+F - Find text"
 
+#statusbar object
 class Statusbar:
 	def __init__(self, parent):
 		self.status = tk.StringVar()
+		self.master = parent.master
 		self.textarea = parent.textarea
-		
-		self.label = tk.Label(self.textarea, textvariable=self.status, bg="white", fg="black", anchor="sw", font=fontspecs)
+		self.label = tk.Label(self.master, textvariable=self.status, bg=userbg, fg=userfg, anchor="sw", font=fontspecs)
 		self.statuson = True
 	
 	def setstatus(self, *args):
-		self.statuson = False if self.statuson else True
+		self.statuson = not self.statuson
 	
 	def updatestatus(self, *args):
 		self.label.pack(side=tk.BOTTOM, fill=tk.X) if self.statuson else self.label.pack_forget()
@@ -44,7 +51,8 @@ class Statusbar:
 		cursorrow = " | col: " + posrow
 		
 		self.status.set(( "saved | " if isinstance(args[0], bool) else "") + cursorcol + cursorrow  + charcount + wordcount)
-		
+
+#menubar object
 class Menubar:
 	def __init__(self, parent):
 		menubar = tk.Menu(parent.master, font=fontspecs)
@@ -59,26 +67,28 @@ class Menubar:
 		
 		#toggle menubar display
 		#menubar.add_cascade(label="xxx", menu=dropdown)
-		
+
+# main
 class omi:
 	def __init__(self, master):
 		self.filename = None;
-		master.title(self.filename)
-		master.geometry("400x400")
-		master.minsize(100,100)
 		self.master = master
+		self.master.geometry("420x420")
+		self.master.minsize(100,100)
+		self.master.protocol("WM_DELETE_WINDOW", self.kill)
 		
 		#textarea
-		self.textarea = tk.Text(master, font=fontspecs, wrap=tk.WORD, undo=True, maxundo=20, autoseparators=True)
-		self.textarea.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+		self.textarea = tk.Text(self.master, pady=0, bg=userbg, fg=userfg, borderwidth=0, font=fontspecs, wrap=tk.WORD, undo=True, maxundo=20, autoseparators=True)
+		self.textarea.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 		
 		#placeholder for instructions
 		self.textarea.insert("1.0", settingstext)
 		
 		#set up window - menubar / statusbar / keybindings
+		self.master.configure(bg=userbg)
 		self.menubar = Menubar(self)
 		self.statusbar = Statusbar(self)
-		self.keybinds()
+		self.keybinds() #move to config file
 		
 		self.textarea.focus_force()
 
@@ -165,7 +175,7 @@ class omi:
 			self.statusbar.updatestatus(True)
 			return True
 		except Exception:
-			donotsave = tk.messagebox.askyesno("DID NOT SAVE", "Would you like to close\nthe file without saving?", default=tk.messagebox.YES)
+			donotsave = messagebox.askyesno("DID NOT SAVE", "Would you like to close\nthe file without saving?", default=messagebox.YES)
 			return True if donotsave else self.saveas()
 		
 	def kill(self, *args):

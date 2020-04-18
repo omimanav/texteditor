@@ -55,19 +55,50 @@ class Statusbar:
 #menubar object
 class Menubar:
 	def __init__(self, parent):
-		menubar = tk.Menu(parent.master, font=fontspecs)
+		menubar = tk.Menu(
+			parent.master
+			,font=fontspecs
+			,bd=0
+			,tearoff=0
+		)
+		dropdown = tk.Menu(
+			menubar
+			,font=fontspecs
+			,tearoff=0
+		)
+		
 		parent.master.config(menu=menubar)
 		
-		dropdown = tk.Menu(menubar, font=fontspecs, tearoff=0)
-		dropdown.add_command(label="New File", command=parent.newfile, accelerator="Ctrl+N")
-		dropdown.add_command(label="Open File", command=parent.openfile, accelerator="Ctrl+O")
-		dropdown.add_command(label="Save", command=parent.save, accelerator="Ctrl+S")
-		dropdown.add_command(label="Save As..", command=parent.saveas, accelerator="Ctrl+Shift+S")
-		dropdown.add_command(label="Close", command=parent.master.destroy, accelerator="Ctrl+W")
+		dropdown.add_command(
+			label="New File"
+			,underline=True
+			,command=parent.newfile
+			,accelerator="Ctrl+N"
+		)
+		dropdown.add_command(
+			label="Open File..."
+			,command=parent.openfile
+			,accelerator="Ctrl+O"
+		)
+		dropdown.add_command(
+			label="Save"
+			,command=parent.save
+			,accelerator="Ctrl+S"
+		)
+		dropdown.add_command(
+			label="Save As..."
+			,command=parent.saveas
+			,accelerator="Ctrl+Shift+S"
+		)
+		dropdown.add_command(
+			label="Close"
+			,command=parent.master.destroy
+			,accelerator="Ctrl+W"
+		)
 		
-		#toggle menubar display
-		#menubar.add_cascade(label="xxx", menu=dropdown)
-
+		#add to window
+		#menubar.add_cascade(label="Options", menu=dropdown)
+		
 # main
 class omi:
 	def __init__(self, master):
@@ -78,13 +109,28 @@ class omi:
 		self.master.protocol("WM_DELETE_WINDOW", self.kill)
 		
 		#textarea
-		self.textarea = tk.Text(self.master, pady=0, bg=userbg, fg=userfg, borderwidth=0, font=fontspecs, wrap=tk.WORD, undo=True, maxundo=20, autoseparators=True)
+		self.textarea = tk.Text(
+			self.master
+			,pady=0
+			,padx=0
+			,bg=userbg
+			,fg=userfg
+			,borderwidth=0
+			,font=fontspecs
+			,wrap=tk.WORD
+			,undo=True
+			,maxundo=20
+			,autoseparators=True
+			,selectbackground=userfg
+			,selectforeground=userbg
+		)
 		self.textarea.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 		
 		#placeholder for instructions
 		self.textarea.insert("1.0", settingstext)
 		
 		#set up window - menubar / statusbar / keybindings
+		self.master.title("")
 		self.master.configure(bg=userbg)
 		self.menubar = Menubar(self)
 		self.statusbar = Statusbar(self)
@@ -106,9 +152,6 @@ class omi:
 				delchar = ".".join([str(curcharrow), str(curcharcol)])
 		except Exception as e:
 			print(e)
-			
-	def synhi(self, word):
-		return 0
 	
 	def indent(self,  *args, width=tabwidth):
 		self.textarea.insert(tk.INSERT, " "*width)
@@ -129,8 +172,9 @@ class omi:
 			defaultextension=".txt"
 			,filetypes=[
 				("All Files", "*.*")
-				,("Text", "*.txt")
-				,("Markup", "*.*ml")
+				,("Plain Text", "*.txt")
+				,("Markdown", "*.md")
+				,("HTML", "*.html")
 				,("CSS", "*.css")
 				,("Python", "*.py")
 				,("JavaScript", "*.js")
@@ -175,7 +219,7 @@ class omi:
 			self.statusbar.updatestatus(True)
 			return True
 		except Exception:
-			donotsave = messagebox.askyesno("DID NOT SAVE", "Would you like to close\nthe file without saving?", default=messagebox.YES)
+			donotsave = messagebox.askyesno("Confirm - File not saved.", "Would you like to continue\nwithout saving?", default=messagebox.YES)
 			return True if donotsave else self.saveas()
 		
 	def kill(self, *args):
@@ -190,6 +234,7 @@ class omi:
 		self.textarea.bind('<Control-S>', self.saveas)
 		self.textarea.bind('<Control-`>', self.statusbar.setstatus)
 		self.textarea.bind('<Control-w>', self.kill)
+		self.textarea.bind('<Alt-F4>', self.kill)
 		if tabstyle=="space":
 			self.textarea.bind('<Tab>', self.indent)
 		self.textarea.bind('<Control-BackSpace>', self.worddelete)
@@ -201,3 +246,5 @@ if __name__ == "__main__":
 	window = omi(master)
 	master.mainloop()
 	
+
+

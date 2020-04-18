@@ -16,6 +16,6 @@ class Userconfig:
 			,"fontspecs":list(fontspecs)
 			,"theme":theme
 		}
-		self.file = open("config.json", "r")
+		self.file = open("config.json", "w")
 		self.file.write(dumps(userconfig))
 		self.file.close()
